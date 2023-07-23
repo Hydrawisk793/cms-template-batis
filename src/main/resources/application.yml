@@ -1,0 +1,39 @@
+server:
+    port: 8050
+    servlet:
+        context-path: /
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/cms_template?characterEncoding=UTF-8&rollbackOnPooledClose=true
+        username: cms_template_admin
+        password: cms_template_admin
+        hikari.maximum-pool-size: 10
+    session:
+        store-type: none
+    devtools:
+        restart:
+            enabled: true
+
+protocol:
+    prefix: /protocol
+    cors:
+        allowed-methods:
+            - OPTIONS
+            - HEAD
+            - GET
+            - POST
+        allowed-origins:
+            - "*"
+
+api:
+    prefix: /api
+    cors:
+        allowed-methods:
+            - OPTIONS
+            - HEAD
+            - GET
+            - POST
+        allowed-origins:
+            - "*"

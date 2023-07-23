@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kaphein.template.cmstemplatebatis.persistence.batis.PagerMapper">
+    <select id="findByPage" resultType="map" parameterType="map">
+        <![CDATA[
+            SELECT
+                ${subQueryAlias}.*
+                , ROW_NUMBER() OVER (
+                    ORDER BY
+        ]]>
+        <foreach item="term" index="index" collection="orderByTerms" open="" separator="," close="">
+            <![CDATA[ ${subQueryAlias}.${term.columnName} ]]>
+            <choose>
+                <when test="true == term.descending">
+                    <![CDATA[ DESC ]]>
+                </when>
+                <otherwise>
+                    <![CDATA[ ASC ]]>
+                </otherwise>
+            </choose>
+        </foreach>
+        <![CDATA[
+                ) AS ${rowNumberColumnName}
+            FROM
+            (
+                ${subQuery}
+            ) AS ${subQueryAlias}
+            ORDER BY
+                ${rowNumberColumnName}
+        ]]>
+        <choose>
+            <when test="_parameter.containsKey('rowNumberDescending') and true == rowNumberDescending">
+                <![CDATA[ DESC ]]>
+            </when>
+            <otherwise>
+                <![CDATA[ ASC ]]>
+            </otherwise>
+        </choose>
+        <![CDATA[
+            LIMIT
+                #{take}
+            OFFSET
+                #{skip}
+        ]]>
+    </select>
+
+    <select id="findPageItemTotalCount" resultType="long" parameterType="map">
+        <![CDATA[
+            SELECT
+                COUNT(*)
+            FROM
+            (
+                ${subQuery}
+            ) AS ${subQueryAlias}
+        ]]>
+    </select>
+</mapper>

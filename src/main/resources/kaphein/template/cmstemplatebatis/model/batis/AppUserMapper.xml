@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kaphein.template.cmstemplatebatis.model.batis.AppUserMapper">
+    <insert
+        id="insert"
+        parameterType="map"
+        useGeneratedKeys="true"
+        keyColumn="user_uid"
+        keyProperty="userUid"
+    >
+        <![CDATA[
+            INSERT INTO t_app_user
+            (
+                created_at
+        ]]>
+        <if test="_parameter.containsKey('createdBy')">
+            <![CDATA[
+                , created_by
+            ]]>
+        </if>
+        <![CDATA[
+                , user_type
+                , login_name
+                , login_password
+                , real_name
+                , email_address
+            )
+            VALUES
+            (
+        ]]>
+        <choose>
+            <when test="_parameter.containsKey('createdAt')">
+                <![CDATA[
+                    #{createdAt}
+                ]]>
+            </when>
+            <otherwise>
+                <![CDATA[
+                    NOW()
+                ]]>
+            </otherwise>
+        </choose>
+        <if test="_parameter.containsKey('createdBy')">
+            <![CDATA[
+                , #{createdBy}
+            ]]>
+        </if>
+        <![CDATA[
+                , #{userType}
+                , #{loginName}
+                , #{loginPassword}
+                , #{realName}
+                , #{emailAddress}
+            )
+        ]]>
+    </insert>
+
+    <update id="update" parameterType="map">
+        <![CDATA[
+            UPDATE t_app_user
+        ]]>
+        <set>
+            <choose>
+                <when test="_parameter.containsKey('updatedAt')">
+                    <![CDATA[
+                        updated_at = #{updatedAt},
+                    ]]>
+                </when>
+                <otherwise>
+                    <![CDATA[
+                        updated_at = NOW(),
+                    ]]>
+                </otherwise>
+            </choose>
+            <if test="_parameter.containsKey('updatedBy')" >
+                <![CDATA[
+                    updated_by = #{updatedBy},
+                ]]>
+            </if>
+            <if test="_parameter.containsKey('userType')" >
+                <![CDATA[
+                    user_type = #{userType},
+                ]]>
+            </if>
+            <if test="_parameter.containsKey('loginPassword')" >
+                <![CDATA[
+                    login_password = #{loginPassword},
+                ]]>
+            </if>
+            <if test="_parameter.containsKey('realName')" >
+                <![CDATA[
+                    real_name = #{realName},
+                ]]>
+            </if>
+            <if test="_parameter.containsKey('emailAddress')" >
+                <![CDATA[
+                    email_address = #{emailAddress},
+                ]]>
+            </if>
+        </set>
+        <![CDATA[
+            WHERE
+                user_uid = #{userUid}
+        ]]>
+    </update>
+
+    <delete id="delete" parameterType="map">
+        <![CDATA[
+        DELETE
+        FROM
+            t_app_user
+        WHERE
+            user_uid = #{user_uid}
+        ]]>
+    </delete>
+
+    <select id="findAll" resultType="map" parameterType="map">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_app_user
+        ORDER BY
+            created_at DESC
+               , user_uid DESC
+        ]]>
+    </select>
+
+    <select id="findByMemberUidIn" resultType="map" parameterType="map">
+        <![CDATA[
+            SELECT
+                *
+            FROM
+                t_app_user
+            WHERE
+                user_uid IS NOT NULL
+        ]]>
+        <choose>
+            <!-- Find all -->
+            <when test="!_parameter.containsKey('values') or null == values">
+                <![CDATA[ ]]>
+            </when>
+            <when test="_parameter.get('values').size() > 0">
+                <![CDATA[ AND user_uid IN ]]>
+                <foreach item="value" index="index" collection="values" open="(" separator="," close=")">
+                    <![CDATA[ #{value} ]]>
+                </foreach>
+            </when>
+            <!-- Find nothing -->
+            <otherwise>
+                <![CDATA[ AND user_uid IS NULL ]]>
+            </otherwise>
+        </choose>
+        <![CDATA[
+            ORDER BY
+                created_at DESC
+                , user_uid DESC
+        ]]>
+    </select>
+
+    <select id="findOneByLoginName" resultType="map" parameterType="string">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_app_user
+        WHERE
+            login_name = #{loginName}
+        ORDER BY
+            created_at DESC
+               , user_uid DESC
+        LIMIT
+            1
+        ]]>
+    </select>
+</mapper>
